@@ -1,10 +1,10 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Form, Button } from "react-bootstrap";
-import { validate, validateFields } from "../utils/common";
+import { validateFields } from "../utils/common";
 import { Link } from "react-router-dom";
 
-class Login extends React.Componen {
+class Login extends React.Component {
   state = {
     email: "",
     password: "",
@@ -18,7 +18,9 @@ class Login extends React.Componen {
     const allFieldsEntered = validateFields(fieldsToValidate);
     if (!allFieldsEntered) {
       this.setState({
-        signin_error: "Please answer all the fields",
+        errorMsg: {
+          signin_error: "Please answer all the fields",
+        },
       });
     } else {
       this.setState({
@@ -38,7 +40,7 @@ class Login extends React.Componen {
   };
 
   render() {
-    const { errorsg } = this.state;
+    const { errorMsg } = this.state;
     return (
       <div className="login-page">
         <h1>Banking Application</h1>
@@ -49,6 +51,32 @@ class Login extends React.Componen {
                 {errorMsg.signin_error}
               </p>
             )}
+            <Form.Group controlID="email">
+              <Form.Label>Email Address:</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                placeholder="Enter Email"
+                onChange={this.handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group controlID="email">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="password"
+                placeholder="Enter Password"
+                onChange={this.handleInputChange}
+              />
+            </Form.Group>
+            <div className="action-items">
+              <Button variant="primary" type="submit">
+                Login
+              </Button>
+              <Link to="/register" className="btn btn-secondary">
+                Create Account
+              </Link>
+            </div>
           </Form>
         </div>
       </div>
