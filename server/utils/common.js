@@ -1,4 +1,4 @@
-const bcrypt = requre("bcryptjs")
+const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const { pool } = require("../db/connect")
 
