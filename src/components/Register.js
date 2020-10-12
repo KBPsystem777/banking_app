@@ -1,9 +1,11 @@
 import React from "react"
 import { connect } from "react-redux"
+import _ from "lodash"
 import { Form, Button } from "react-bootstrap"
+import { registerNewUser } from "../actions/auth"
+import { resetErrors } from "../actions/errors"
 import { validateFields } from "../utils/common"
 import { Link } from "react-router-dom"
-import { identity } from "lodash"
 
 class Register extends React.Component {
   state = {
@@ -17,9 +19,20 @@ class Register extends React.Component {
     isSubmitted: false,
   }
 
-  registerUser = (e) => {
-    e.preventDefault()
+  componentDidUpdate(prevProps) {
+    if (!_.isEqual(prevProps.errors, this.props.errors)) {
+      this.setState({ errorMsg: this.props.errors })
+    }
+  }
+
+  componentWillUnmount() {
+    this.props.dispatch(resetErrors())
+  }
+
+  registerUser = (event) => {
+    event.preventDefault()
     const { first_name, last_name, email, password, cpassword } = this.state
+
     const fieldsToValidate = [
       { first_name },
       { last_name },
@@ -32,24 +45,34 @@ class Register extends React.Component {
     if (!allFieldsEntered) {
       this.setState({
         errorMsg: {
-          signup_error: "Please enter all the fields",
+          signup_error: "Please enter all the fields.",
         },
       })
     } else {
       if (password !== cpassword) {
         this.setState({
           errorMsg: {
-            signup_error: "Password doesnt match",
+            signup_error: "Password and confirm password does not match.",
           },
         })
       } else {
         this.setState({ isSubmitted: true })
+        this.props
+          .dispatch(registerNewUser({ first_name, last_name, email, password }))
+          .then((response) => {
+            if (response.success) {
+              this.setState({
+                successMsg: "User registered successfully.",
+                errorMsg: "",
+              })
+            }
+          })
       }
     }
   }
 
-  handleInputchange = (e) => {
-    const { name, value } = e.target
+  handleInputChange = (event) => {
+    const { name, value } = event.target
     this.setState({
       [name]: value,
     })
@@ -72,30 +95,30 @@ class Register extends React.Component {
               )
             )}
             <Form.Group controlId="first_name">
-              <Form.Label>First Name</Form.Label>
+              <Form.Label>First name</Form.Label>
               <Form.Control
                 type="text"
                 name="first_name"
                 placeholder="Enter first name"
-                onChange={this.handleInputchange}
+                onChange={this.handleInputChange}
               />
             </Form.Group>
             <Form.Group controlId="last_name">
-              <Form.Label>Last Name</Form.Label>
+              <Form.Label>Last name</Form.Label>
               <Form.Control
                 type="text"
                 name="last_name"
                 placeholder="Enter last name"
-                onChange={this.handleInputchange}
+                onChange={this.handleInputChange}
               />
             </Form.Group>
             <Form.Group controlId="email">
-              <Form.Label>Email Address</Form.Label>
+              <Form.Label>Email address</Form.Label>
               <Form.Control
                 type="email"
                 name="email"
                 placeholder="Enter email"
-                onChange={this.handleInputchange}
+                onChange={this.handleInputChange}
               />
             </Form.Group>
             <Form.Group controlId="password">
@@ -104,16 +127,16 @@ class Register extends React.Component {
                 type="password"
                 name="password"
                 placeholder="Enter password"
-                onChange={this.handleInputchange}
+                onChange={this.handleInputChange}
               />
             </Form.Group>
             <Form.Group controlId="cpassword">
-              <Form.Label>Confirm Password</Form.Label>
+              <Form.Label>Confirm password</Form.Label>
               <Form.Control
                 type="password"
                 name="cpassword"
-                placeholder="Confirm your password"
-                onChange={this.handleInputchange}
+                placeholder="Enter confirm password"
+                onChange={this.handleInputChange}
               />
             </Form.Group>
             <div className="action-items">
@@ -130,4 +153,9 @@ class Register extends React.Component {
     )
   }
 }
-export default Register
+
+const mapStateToProps = (state) => ({
+  errors: state.errors,
+})
+
+export default connect(mapStateToProps)(Register)
