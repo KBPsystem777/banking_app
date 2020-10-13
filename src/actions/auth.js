@@ -1,7 +1,8 @@
 import { SIGN_IN, BASE_API_URL } from "../utils/constants"
 import axios from "axios"
 import { getErrors } from "./errors"
-
+import { history } from "../router/AppRouter"
+import { initiateGetProfile } from "./profile"
 export const signIn = (user) => ({
   type: SIGN_IN,
   user,
@@ -17,6 +18,8 @@ export const initiateLogin = (email, password) => {
       const user = result.data
       localStorage.setItem("user_token", user.token)
       dispatch(signIn(user))
+      dispatch(initiateGetProfile(user.email))
+      history.push("/profile")
     } catch (error) {
       console.log(error)
       error.response && dispatch(getErrors(error.response.data))
